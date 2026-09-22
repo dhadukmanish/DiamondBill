@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: diamondbill-postgres
+    environment:
+      POSTGRES_USER: diamondbill
+      POSTGRES_PASSWORD: diamondbill
+      POSTGRES_DB: diamondbill
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

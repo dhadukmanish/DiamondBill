@@ -1,0 +1,18 @@
+{
+  "name": "diamondbill",
+  "private": true,
+  "version": "0.1.0",
+  "description": "DiamondBill — diamond trading accounting & inventory (Flomiz Diamond Finance clone)",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter ./apps/* dev",
+    "dev:api": "pnpm --filter @diamondbill/api dev",
+    "dev:web": "pnpm --filter @diamondbill/web dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "db:generate": "pnpm --filter @diamondbill/api db:generate",
+    "db:migrate": "pnpm --filter @diamondbill/api db:migrate",
+    "db:seed": "pnpm --filter @diamondbill/api db:seed"
+  },
+  "engines": { "node": ">=20" }
+}
