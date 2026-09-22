@@ -1,10 +1,10 @@
 import type { FastifyInstance } from 'fastify';
 import { and, asc, eq, sql } from 'drizzle-orm';
-import { db, schema } from '../db/client.js';
+import { db, schema } from '../db/client';
 import { customFieldSchema, CUSTOM_FIELD_MODULES, CUSTOM_FIELD_TYPE_GROUPS, DIAMOND_PROPERTY_TYPES } from '@diamondbill/shared';
-import { parse } from '../lib/validate.js';
-import { notFound, validation } from '../lib/errors.js';
-import { ok } from '../lib/respond.js';
+import { parse } from '../lib/validate';
+import { notFound, validation } from '../lib/errors';
+import { ok } from '../lib/respond';
 
 export const slugify = (s: string) =>
   s

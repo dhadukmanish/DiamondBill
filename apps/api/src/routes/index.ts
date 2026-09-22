@@ -1,13 +1,14 @@
 import type { FastifyInstance } from 'fastify';
-import { authRoutes } from './auth.js';
-import { orgRoutes } from './org.js';
-import { seriesRoutes } from './series.js';
-import { accountRoutes } from './accounts.js';
-import { customFieldRoutes } from './customFields.js';
-import { contactRoutes } from './contacts.js';
-import { userRoutes } from './users.js';
-import { settingsRoutes } from './settings.js';
-import { prefRoutes } from './prefs.js';
+import { authRoutes } from './auth';
+import { orgRoutes } from './org';
+import { seriesRoutes } from './series';
+import { accountRoutes } from './accounts';
+import { customFieldRoutes } from './customFields';
+import { contactRoutes } from './contacts';
+import { userRoutes } from './users';
+import { settingsRoutes } from './settings';
+import { prefRoutes } from './prefs';
+import { masterRoutes } from './masters';
 
 export async function registerRoutes(app: FastifyInstance) {
   await app.register(authRoutes);
@@ -19,4 +20,5 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(userRoutes);
   await app.register(settingsRoutes);
   await app.register(prefRoutes);
+  await app.register(masterRoutes);
 }

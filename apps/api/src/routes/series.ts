@@ -1,11 +1,11 @@
 import type { FastifyInstance } from 'fastify';
 import { and, asc, eq, ilike, or, sql } from 'drizzle-orm';
-import { db, schema } from '../db/client.js';
+import { db, schema } from '../db/client';
 import { seriesSchema, seriesBulkSchema, SERIES_DEFAULT_CODES, SERIES_USED_FOR } from '@diamondbill/shared';
-import { parse } from '../lib/validate.js';
-import { notFound, validation } from '../lib/errors.js';
-import { ok } from '../lib/respond.js';
-import { parseListQuery } from '../lib/list.js';
+import { parse } from '../lib/validate';
+import { notFound, validation } from '../lib/errors';
+import { ok } from '../lib/respond';
+import { parseListQuery } from '../lib/list';
 
 export function formatSeriesNumber(s: { prefix: string; postfix: string; paddingLength: number }, n: number) {
   return `${s.prefix}${String(n).padStart(s.paddingLength, '0')}${s.postfix}`;

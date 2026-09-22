@@ -1,13 +1,13 @@
 import type { FastifyInstance } from 'fastify';
 import bcrypt from 'bcryptjs';
 import { and, asc, desc, eq, ilike, or, count } from 'drizzle-orm';
-import { db, schema } from '../db/client.js';
+import { db, schema } from '../db/client';
 import { userSchema, PERMISSIONS, PERMISSION_ACTIONS } from '@diamondbill/shared';
-import { parse } from '../lib/validate.js';
-import { notFound, validation } from '../lib/errors.js';
-import { ok } from '../lib/respond.js';
-import { parseListQuery } from '../lib/list.js';
-import { publicUser } from './auth.js';
+import { parse } from '../lib/validate';
+import { notFound, validation } from '../lib/errors';
+import { ok } from '../lib/respond';
+import { parseListQuery } from '../lib/list';
+import { publicUser } from './auth';
 
 export async function userRoutes(app: FastifyInstance) {
   app.get('/api/admin/users', { preHandler: app.requirePermission('admin_users') }, async (req) => {

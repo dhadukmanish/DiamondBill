@@ -3,9 +3,9 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import multipart from '@fastify/multipart';
-import authPlugin from './plugins/auth.js';
-import errorPlugin from './plugins/errors.js';
-import { registerRoutes } from './routes/index.js';
+import authPlugin from './plugins/auth';
+import errorPlugin from './plugins/errors';
+import { registerRoutes } from './routes/index';
 
 const PORT = Number(process.env.PORT ?? 4000);
 

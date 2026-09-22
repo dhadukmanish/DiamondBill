@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
-import { db, sql, schema } from './client.js';
-import { seedTenantDefaults } from '../services/tenant-setup.js';
+import { db, sql, schema } from './client';
+import { seedTenantDefaults, seedMasterDefaults } from '../services/tenant-setup';
 
 const TENANT_SLUG = process.env.SEED_TENANT_SLUG ?? 'demo';
 const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? 'admin@diamondbill.local';
@@ -11,7 +11,8 @@ const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? 'Admin@1234';
 async function main() {
   const existing = await db.select().from(schema.tenants).where(eq(schema.tenants.slug, TENANT_SLUG)).limit(1);
   if (existing.length) {
-    console.log(`Tenant "${TENANT_SLUG}" already exists — nothing to do.`);
+    await seedMasterDefaults(db, existing[0].id);
+    console.log(`Tenant "${TENANT_SLUG}" already exists — master defaults backfilled where missing.`);
     return;
   }
   const [tenant] = await db.insert(schema.tenants).values({ name: 'Demo Diamond Inc', slug: TENANT_SLUG, reportingCurrency: 'INR' }).returning();

@@ -341,3 +341,16 @@ export const PROCESS_BEHAVIORS = ['general', 'lab', 'pricing'] as const;
 export const PROCESS_RETURN_STATUSES = ['available', 'keep_in_process'] as const;
 export const PAYMENT_MODES_DEFAULT = ['Bank Transfer', 'Cash', 'Credit Card', 'Debit Card', 'Others', 'UPI'] as const;
 export const USER_ROLES = ['super_admin', 'admin', 'user'] as const;
+
+// ---- Master data helpers ----
+export const LAB_TYPE_LABELS: Record<(typeof LAB_TYPES)[number], string> = { gia: 'GIA', igi: 'IGI', hrd: 'HRD', idl: 'IDL', egl: 'EGL', other: 'Other' };
+export const PRODUCT_STOCK_TYPE_LABELS: Record<ProductStockType, string> = { general: 'General', loose_diamond: 'Loose Diamond', certified: 'Certified', metal: 'Metal', stone: 'Stone', jewellery: 'Jewellery' };
+/** Indian GST Unit Quantity Codes (most used). */
+export const UQC_CODES: { code: string; label: string }[] = [
+  { code: 'CTM', label: 'Carats' }, { code: 'PCS', label: 'Pieces' }, { code: 'GMS', label: 'Grams' }, { code: 'KGS', label: 'Kilograms' }, { code: 'MGS', label: 'Milligrams' },
+  { code: 'NOS', label: 'Numbers' }, { code: 'PRS', label: 'Pairs' }, { code: 'SET', label: 'Sets' }, { code: 'BOX', label: 'Box' }, { code: 'PAC', label: 'Packs' }, { code: 'DOZ', label: 'Dozens' },
+  { code: 'MTR', label: 'Meters' }, { code: 'CMS', label: 'Centimeters' }, { code: 'MMS', label: 'Millimeters' }, { code: 'LTR', label: 'Litres' }, { code: 'MLT', label: 'Millilitre' }, { code: 'UNT', label: 'Units' },
+  { code: 'TON', label: 'Tonnes' }, { code: 'QTL', label: 'Quintal' }, { code: 'BAG', label: 'Bags' }, { code: 'BDL', label: 'Bundles' }, { code: 'ROL', label: 'Rolls' }, { code: 'SQF', label: 'Square feet' }, { code: 'SQM', label: 'Square meters' }, { code: 'OTH', label: 'Others' },
+];
+export const TDS_SECTIONS = ['192', '193', '194', '194A', '194B', '194C', '194D', '194H', '194I', '194J', '194K', '194N', '194O', '194Q', '195', '206AB'] as const;
+export const TCS_SECTIONS = ['206C(1)', '206C(1C)', '206C(1F)', '206C(1G)', '206C(1H)'] as const;

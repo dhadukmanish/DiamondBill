@@ -105,12 +105,31 @@ export interface Option { value: string; label: string; sub?: string }
 export function Combobox({ value, onChange, options, placeholder = 'Select...', multiple, disabled, className, size, clearable = true, onCreate, createLabel }: { value: string | string[] | null | undefined; onChange: (v: any) => void; options: Option[]; placeholder?: string; multiple?: boolean; disabled?: boolean; className?: string; size?: 'sm'; clearable?: boolean; onCreate?: (text: string) => void; createLabel?: string }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
+  const [pos, setPos] = useState<{ top: number; left: number; width: number; up: boolean }>({ top: 0, left: 0, width: 0, up: false });
   const ref = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+  const place = () => {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    const up = window.innerHeight - r.bottom < 280 && r.top > 280;
+    setPos({ top: up ? r.top : r.bottom, left: r.left, width: Math.max(r.width, 220), up });
+  };
   useEffect(() => {
-    const h = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
+    if (!open) return;
+    place();
+    const h = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && !popRef.current?.contains(e.target as Node) && setOpen(false);
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && (e.stopPropagation(), setOpen(false));
     document.addEventListener('mousedown', h);
-    return () => document.removeEventListener('mousedown', h);
-  }, []);
+    document.addEventListener('keydown', esc, true);
+    window.addEventListener('resize', place);
+    document.addEventListener('scroll', place, true);
+    return () => {
+      document.removeEventListener('mousedown', h);
+      document.removeEventListener('keydown', esc, true);
+      window.removeEventListener('resize', place);
+      document.removeEventListener('scroll', place, true);
+    };
+  }, [open]);
   const selected = useMemo(() => (multiple ? (Array.isArray(value) ? value : []) : value ? [String(value)] : []), [value, multiple]);
   const filtered = useMemo(() => (q ? options.filter((o) => (o.label + ' ' + (o.sub ?? '')).toLowerCase().includes(q.toLowerCase())) : options), [options, q]);
   const toggle = (v: string) => {
@@ -142,29 +161,31 @@ export function Combobox({ value, onChange, options, placeholder = 'Select...', 
           <ChevronDown className="h-4 w-4" />
         </span>
       </button>
-      {open && (
-        <div className="absolute z-50 mt-1 w-full min-w-[220px] card shadow-lg overflow-hidden">
-          <div className="flex items-center gap-2 border-b border-line px-3">
-            <Search className="h-4 w-4 text-gray-400" />
-            <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search..." className="h-9 w-full text-[13px] outline-none" onKeyDown={(e) => { if (e.key === 'Enter' && filtered[0]) toggle(filtered[0].value); }} />
-          </div>
-          <ul className="max-h-60 overflow-y-auto py-1">
-            {filtered.length === 0 && !onCreate && <li className="px-3 py-2 text-[13px] text-gray-500">No results</li>}
-            {filtered.map((o) => (
-              <li key={o.value} onClick={() => toggle(o.value)} className={cx('flex items-center justify-between gap-2 px-3 py-2 text-[13px] cursor-pointer hover:bg-gray-50', selected.includes(o.value) && 'bg-primary-lighter/40')}>
-                <span className="truncate">
-                  {o.label}
-                  {o.sub && <span className="ml-1 text-gray-400">{o.sub}</span>}
-                </span>
-                {selected.includes(o.value) && <Check className="h-4 w-4 text-primary shrink-0" />}
-              </li>
-            ))}
-            {onCreate && q && !filtered.some((o) => o.label.toLowerCase() === q.toLowerCase()) && (
-              <li onClick={() => { onCreate(q); setQ(''); setOpen(false); }} className="px-3 py-2 text-[13px] text-primary cursor-pointer hover:bg-gray-50">+ {createLabel ?? 'Add'} "{q}"</li>
-            )}
-          </ul>
-        </div>
-      )}
+      {open &&
+        createPortal(
+          <div ref={popRef} style={{ position: 'fixed', left: pos.left, width: pos.width, ...(pos.up ? { bottom: window.innerHeight - pos.top + 4 } : { top: pos.top + 4 }) }} className="z-[100] card shadow-lg overflow-hidden">
+            <div className="flex items-center gap-2 border-b border-line px-3">
+              <Search className="h-4 w-4 text-gray-400" />
+              <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type to search" className="h-9 w-full text-[13px] outline-none" onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (filtered[0]) toggle(filtered[0].value); } }} />
+            </div>
+            <ul className="max-h-60 overflow-y-auto py-1">
+              {filtered.length === 0 && !onCreate && <li className="px-3 py-2 text-[13px] text-gray-500">No results</li>}
+              {filtered.map((o) => (
+                <li key={o.value} onClick={() => toggle(o.value)} className={cx('flex items-center justify-between gap-2 px-3 py-2 text-[13px] cursor-pointer hover:bg-gray-50', selected.includes(o.value) && 'bg-primary-lighter/40')}>
+                  <span className="truncate">
+                    {o.label}
+                    {o.sub && <span className="ml-1 text-gray-400">{o.sub}</span>}
+                  </span>
+                  {selected.includes(o.value) && <Check className="h-4 w-4 text-primary shrink-0" />}
+                </li>
+              ))}
+              {onCreate && q && !filtered.some((o) => o.label.toLowerCase() === q.toLowerCase()) && (
+                <li onClick={() => { onCreate(q); setQ(''); setOpen(false); }} className="px-3 py-2 text-[13px] text-primary cursor-pointer hover:bg-gray-50">+ {createLabel ?? 'Add'} "{q}"</li>
+              )}
+            </ul>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import type { ZodSchema } from 'zod';
-import { AppError } from './errors.js';
+import { AppError } from './errors';
 
 export function parse<T>(schema: ZodSchema<T>, input: unknown): T {
   const r = schema.safeParse(input);

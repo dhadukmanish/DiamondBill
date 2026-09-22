@@ -1,12 +1,12 @@
 import type { FastifyInstance } from 'fastify';
 import { and, asc, desc, eq, ilike, or, sql, count } from 'drizzle-orm';
-import { db, schema } from '../db/client.js';
+import { db, schema } from '../db/client';
 import { firmSchema, branchSchema, fiscalYearSchema, currencySchema } from '@diamondbill/shared';
-import { parse } from '../lib/validate.js';
-import { notFound, validation } from '../lib/errors.js';
-import { ok } from '../lib/respond.js';
-import { parseListQuery } from '../lib/list.js';
-import { logActivity } from '../services/activity.js';
+import { parse } from '../lib/validate';
+import { notFound, validation } from '../lib/errors';
+import { ok } from '../lib/respond';
+import { parseListQuery } from '../lib/list';
+import { logActivity } from '../services/activity';
 import { z } from 'zod';
 
 export async function orgRoutes(app: FastifyInstance) {

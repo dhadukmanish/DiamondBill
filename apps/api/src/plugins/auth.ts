@@ -1,8 +1,8 @@
 import fp from 'fastify-plugin';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { eq } from 'drizzle-orm';
-import { db, schema } from '../db/client.js';
-import { AppError, forbidden } from '../lib/errors.js';
+import { db, schema } from '../db/client';
+import { AppError, forbidden } from '../lib/errors';
 import type { PermissionAction } from '@diamondbill/shared';
 
 export interface AuthUser {

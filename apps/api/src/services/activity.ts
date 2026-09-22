@@ -1,5 +1,5 @@
 import type { FastifyRequest } from 'fastify';
-import { db, schema } from '../db/client.js';
+import { db, schema } from '../db/client';
 
 export async function logActivity(req: FastifyRequest, entityType: string, entityId: string, action: string, description: string, meta: Record<string, unknown> = {}) {
   try {

@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
-import { getSettings, updateSettings } from '../services/settings.js';
-import { ok } from '../lib/respond.js';
+import { getSettings, updateSettings } from '../services/settings';
+import { ok } from '../lib/respond';
 
 export async function settingsRoutes(app: FastifyInstance) {
   app.get('/api/accounting/masters/firm-settings', { preHandler: app.authenticate }, async (req) => ok(await getSettings(req.user.tenantId), 'Firm settings retrieved successfully'));

@@ -2,11 +2,11 @@ import type { FastifyInstance } from 'fastify';
 import bcrypt from 'bcryptjs';
 import { and, eq, or, gt } from 'drizzle-orm';
 import { randomBytes } from 'node:crypto';
-import { db, schema } from '../db/client.js';
+import { db, schema } from '../db/client';
 import { loginSchema, PERMISSIONS, allPermissions } from '@diamondbill/shared';
-import { parse } from '../lib/validate.js';
-import { AppError } from '../lib/errors.js';
-import { ok } from '../lib/respond.js';
+import { parse } from '../lib/validate';
+import { AppError } from '../lib/errors';
+import { ok } from '../lib/respond';
 
 const REFRESH_DAYS = 30;
 

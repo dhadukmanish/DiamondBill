@@ -140,6 +140,8 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
       { label: 'Cheque Book', href: '/modules/settings/cheque-books', permission: 'acc_cheque_books' },
       { label: 'Carriers', href: '/modules/settings/carriers', permission: 'acc_carriers' },
       { label: 'Shipment Statuses', href: '/modules/settings/shipment-statuses', permission: 'acc_shipment_statuses' },
+      { label: 'Payment Modes', href: '/modules/settings/payment-modes', permission: 'acc_banking' },
+      { label: 'Payment Terms', href: '/modules/settings/payment-terms', permission: 'admin_general_settings' },
     ],
   },
   {

@@ -1,10 +1,10 @@
 import type { FastifyInstance } from 'fastify';
 import { and, asc, eq, ilike, or, isNull, inArray } from 'drizzle-orm';
-import { db, schema } from '../db/client.js';
+import { db, schema } from '../db/client';
 import { accountSchema, ACCOUNT_NATURE_BY_TYPE, ACCOUNT_SUB_TYPES } from '@diamondbill/shared';
-import { parse } from '../lib/validate.js';
-import { notFound, validation } from '../lib/errors.js';
-import { ok } from '../lib/respond.js';
+import { parse } from '../lib/validate';
+import { notFound, validation } from '../lib/errors';
+import { ok } from '../lib/respond';
 
 export async function accountRoutes(app: FastifyInstance) {
   /** Full tree with balances (balances come from journal — 0 until Phase 3) */

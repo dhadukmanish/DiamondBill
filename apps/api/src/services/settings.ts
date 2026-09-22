@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
-import { db, schema } from '../db/client.js';
-import { DEFAULT_FIRM_SETTINGS } from '../db/seed-data/coa.js';
+import { db, schema } from '../db/client';
+import { DEFAULT_FIRM_SETTINGS } from '../db/seed-data/coa';
 
 export type FirmSettings = typeof DEFAULT_FIRM_SETTINGS & Record<string, any>;
 

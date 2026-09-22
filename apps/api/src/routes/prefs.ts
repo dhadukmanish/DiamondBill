@@ -1,8 +1,8 @@
 import type { FastifyInstance } from 'fastify';
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
-import { db, schema } from '../db/client.js';
-import { ok } from '../lib/respond.js';
+import { db, schema } from '../db/client';
+import { ok } from '../lib/respond';
 
 export async function prefRoutes(app: FastifyInstance) {
   app.get('/api/column-preferences', { preHandler: app.authenticate }, async (req) => {

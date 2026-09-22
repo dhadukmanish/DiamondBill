@@ -19,6 +19,8 @@ const CustomFieldsPage = lazy(() => import('@/pages/settings/CustomFieldsPage'))
 const GeneralSettingsPage = lazy(() => import('@/pages/settings/GeneralSettingsPage'));
 const ChartOfAccounts = lazy(() => import('@/pages/accounting/ChartOfAccounts'));
 const ContactsPage = lazy(() => import('@/pages/crm/ContactsPage'));
+const MP = (name: string) => lazy(() => import('@/pages/settings/MasterPages').then((m: any) => ({ default: m[name] })));
+const TaxesPage = MP('TaxesPage'), TdsPage = MP('TdsPage'), TcsPage = MP('TcsPage'), UnitsPage = MP('UnitsPage'), CategoriesPage = MP('CategoriesPage'), LabsPage = MP('LabsPage'), SalesPersonsPage = MP('SalesPersonsPage'), TermsPage = MP('TermsPage'), ChequeBooksPage = MP('ChequeBooksPage'), CarriersPage = MP('CarriersPage'), ShipmentStatusesPage = MP('ShipmentStatusesPage'), ProcessesPage = MP('ProcessesPage'), PriceListsPage = MP('PriceListsPage'), ProductNameTemplatesPage = MP('ProductNameTemplatesPage'), PaymentModesPage = MP('PaymentModesPage'), PaymentTermsPage = MP('PaymentTermsPage');
 
 function Protected() {
   const token = useAuthStore((s) => s.accessToken);
@@ -42,6 +44,7 @@ export default function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/modules/crm/contacts" element={<ContactsPage />} />
               <Route path="/modules/accounting/masters/chart-of-accounts" element={<ChartOfAccounts />} />
+              <Route path="/modules/accounting/product-process/processes" element={<ProcessesPage />} />
               <Route path="/modules/accounting/*" element={<ComingSoon />} />
               <Route path="/modules/diamond/*" element={<ComingSoon />} />
               <Route path="/modules/settings" element={<SettingsHub />} />
@@ -54,6 +57,21 @@ export default function App() {
                 <Route path="users" element={<UsersPage />} />
                 <Route path="custom-fields" element={<CustomFieldsPage />} />
                 <Route path="general" element={<GeneralSettingsPage />} />
+                <Route path="taxes" element={<TaxesPage />} />
+                <Route path="tds-settings" element={<TdsPage />} />
+                <Route path="tcs-rates" element={<TcsPage />} />
+                <Route path="units" element={<UnitsPage />} />
+                <Route path="product-categories" element={<CategoriesPage />} />
+                <Route path="labs" element={<LabsPage />} />
+                <Route path="sales-persons" element={<SalesPersonsPage />} />
+                <Route path="terms-conditions" element={<TermsPage />} />
+                <Route path="cheque-books" element={<ChequeBooksPage />} />
+                <Route path="carriers" element={<CarriersPage />} />
+                <Route path="shipment-statuses" element={<ShipmentStatusesPage />} />
+                <Route path="price-lists" element={<PriceListsPage />} />
+                <Route path="product-name-templates" element={<ProductNameTemplatesPage />} />
+                <Route path="payment-modes" element={<PaymentModesPage />} />
+                <Route path="payment-terms" element={<PaymentTermsPage />} />
                 <Route path="*" element={<ComingSoon />} />
               </Route>
               <Route path="*" element={<NotFound />} />

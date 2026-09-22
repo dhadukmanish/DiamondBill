@@ -1,7 +1,8 @@
-import type { Db } from '../db/client.js';
-import { schema } from '../db/client.js';
-import { SYSTEM_ACCOUNTS, DEFAULT_FIRM_SETTINGS } from '../db/seed-data/coa.js';
-import { ACCOUNT_NATURE_BY_TYPE } from '@diamondbill/shared';
+import type { Db } from '../db/client';
+import { eq } from 'drizzle-orm';
+import { schema } from '../db/client';
+import { SYSTEM_ACCOUNTS, DEFAULT_FIRM_SETTINGS } from '../db/seed-data/coa';
+import { ACCOUNT_NATURE_BY_TYPE, PAYMENT_MODES_DEFAULT } from '@diamondbill/shared';
 
 /** Creates the default firm, branch, base currency, system accounts, default settings for a new tenant. */
 export async function seedTenantDefaults(
@@ -84,5 +85,38 @@ export async function seedTenantDefaults(
       inventoryAssetAccountId: idByKey.get('inventory_asset'),
     },
   });
+  await seedMasterDefaults(db, tenantId);
   return { firm, branch };
+}
+
+/** Master defaults (taxes, units, shipment statuses, payment modes/terms, carriers). Idempotent — skips tables that already have rows for the tenant. */
+export async function seedMasterDefaults(db: Db, tenantId: string) {
+  const empty = async (t: any) => (await db.select({ id: t.id }).from(t).where(eq(t.tenantId, tenantId)).limit(1)).length === 0;
+  if (await empty(schema.taxGroups)) await db.insert(schema.taxGroups).values([
+    { tenantId, name: 'Out of Scope', taxType: 'out_of_scope', gstCategory: 'intra_state', rate: '0', isSystem: true },
+    { tenantId, name: 'GST 3%', taxType: 'gst', gstCategory: 'intra_state', rate: '3', cgstRate: '1.5', sgstRate: '1.5' },
+    { tenantId, name: 'IGST 3%', taxType: 'gst', gstCategory: 'inter_state', rate: '3', igstRate: '3' },
+  ]);
+  if (await empty(schema.units)) await db.insert(schema.units).values([
+    { tenantId, name: 'Carat', uqcCode: 'CTM', decimalPlaces: 3, isSystem: true },
+    { tenantId, name: 'Pieces', uqcCode: 'PCS', decimalPlaces: 0, isSystem: true },
+    { tenantId, name: 'Grams', uqcCode: 'GMS', decimalPlaces: 3 },
+  ]);
+  if (await empty(schema.shipmentStatuses)) await db.insert(schema.shipmentStatuses).values([
+    { tenantId, name: 'Shipped', statusType: 'shipped', isSystem: true },
+    { tenantId, name: 'Delivered', statusType: 'delivered', isSystem: true },
+  ]);
+  if (await empty(schema.paymentModes)) await db.insert(schema.paymentModes).values(PAYMENT_MODES_DEFAULT.map((name) => ({ tenantId, name, isSystem: true })));
+  if (await empty(schema.paymentTerms)) await db.insert(schema.paymentTerms).values([
+    { tenantId, name: 'Due on Receipt', days: 0, isSystem: true },
+    { tenantId, name: 'Net 15', days: 15, isSystem: true },
+    { tenantId, name: 'Net 30', days: 30, isSystem: true },
+    { tenantId, name: 'Net 45', days: 45, isSystem: true },
+    { tenantId, name: 'Net 60', days: 60, isSystem: true },
+  ]);
+  if (await empty(schema.carriers)) await db.insert(schema.carriers).values([
+    { tenantId, name: 'Blue Dart', trackingUrl: 'https://www.bluedart.com/tracking?awb={tracking_number}' },
+    { tenantId, name: 'Sequel Logistics', trackingUrl: null },
+    { tenantId, name: 'Brinks', trackingUrl: null },
+  ]);
 }
