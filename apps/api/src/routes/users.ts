@@ -7,6 +7,7 @@ import { parse } from '../lib/validate';
 import { notFound, validation } from '../lib/errors';
 import { ok } from '../lib/respond';
 import { parseListQuery } from '../lib/list';
+import { filterWhere, sortBy, tableColumns } from '../lib/filters';
 import { publicUser } from './auth';
 
 export async function userRoutes(app: FastifyInstance) {
@@ -16,10 +17,11 @@ export async function userRoutes(app: FastifyInstance) {
     const where = and(
       eq(schema.users.tenantId, req.user.tenantId),
       isActive === 'true' ? eq(schema.users.isActive, true) : isActive === 'false' ? eq(schema.users.isActive, false) : undefined,
+      filterWhere((req.query as any).filters, tableColumns(schema.users)),
       q.search ? or(ilike(schema.users.firstName, `%${q.search}%`), ilike(schema.users.lastName, `%${q.search}%`), ilike(schema.users.email, `%${q.search}%`)) : undefined,
     );
     const [{ total }] = await db.select({ total: count() }).from(schema.users).where(where);
-    const rows = await db.select().from(schema.users).where(where).orderBy(desc(schema.users.createdAt)).limit(q.limit).offset((q.page - 1) * q.limit);
+    const rows = await db.select().from(schema.users).where(where).orderBy(sortBy(q.sortBy, q.sortOrder, tableColumns(schema.users), schema.users.createdAt)).limit(q.limit).offset((q.page - 1) * q.limit);
     return ok({ rows: rows.map(publicUser), total: Number(total), page: q.page, pageSize: q.limit }, 'Users retrieved successfully');
   });
 

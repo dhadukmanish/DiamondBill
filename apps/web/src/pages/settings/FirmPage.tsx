@@ -91,7 +91,7 @@ export default function FirmPage() {
   const can = useAuthStore((s) => s.can);
   const remove = useSave({ invalidate: ['firms', 'lookup'], onSuccess: () => setDel(null) });
   const columns: Column<Firm>[] = [
-    { key: 'name', header: 'Firm Name', sortable: true, render: (r) => <span className="flex items-center gap-2 font-medium text-gray-900">{r.name}{r.isDefault && <Badge color="blue">Default</Badge>}</span> },
+    { key: 'name', header: 'Firm Name', locked: true, render: (r) => <span className="flex items-center gap-2 font-medium text-gray-900">{r.name}{r.isDefault && <Badge color="blue">Default</Badge>}</span> },
     { key: 'gstin', header: 'GSTIN', render: (r) => r.taxIds?.find((t: any) => t.label === 'GSTIN' && t.enabled)?.value || r.gstin || '-' },
     { key: 'countryCode', header: 'Country' },
     { key: 'currency', header: 'Currency' },

@@ -6,6 +6,7 @@ import { parse } from '../lib/validate';
 import { notFound, validation } from '../lib/errors';
 import { ok } from '../lib/respond';
 import { parseListQuery } from '../lib/list';
+import { filterWhere, sortBy, tableColumns } from '../lib/filters';
 import { logActivity } from '../services/activity';
 import { z } from 'zod';
 
@@ -19,9 +20,9 @@ export async function orgRoutes(app: FastifyInstance) {
 
   app.get('/api/organizations/firms', { preHandler: app.requirePermission('admin_firms') }, async (req) => {
     const q = parseListQuery(req.query as any);
-    const where = and(eq(schema.firms.tenantId, req.user.tenantId), q.search ? or(ilike(schema.firms.name, `%${q.search}%`), ilike(schema.firms.gstin, `%${q.search}%`)) : undefined);
+    const where = and(eq(schema.firms.tenantId, req.user.tenantId), filterWhere((req.query as any).filters, tableColumns(schema.firms)), q.search ? or(ilike(schema.firms.name, `%${q.search}%`), ilike(schema.firms.gstin, `%${q.search}%`)) : undefined);
     const [{ total }] = await db.select({ total: count() }).from(schema.firms).where(where);
-    const rows = await db.select().from(schema.firms).where(where).orderBy(desc(schema.firms.isDefault), asc(schema.firms.name)).limit(q.limit).offset((q.page - 1) * q.limit);
+    const rows = await db.select().from(schema.firms).where(where).orderBy(q.sortBy ? sortBy(q.sortBy, q.sortOrder, tableColumns(schema.firms), schema.firms.name) : desc(schema.firms.isDefault), asc(schema.firms.name)).limit(q.limit).offset((q.page - 1) * q.limit);
     return ok({ rows, total: Number(total), page: q.page, pageSize: q.limit }, 'Firms retrieved successfully');
   });
 
@@ -72,6 +73,7 @@ export async function orgRoutes(app: FastifyInstance) {
     const where = and(
       eq(schema.branches.tenantId, req.user.tenantId),
       q.firmId ? eq(schema.branches.firmId, q.firmId) : undefined,
+      filterWhere((req.query as any).filters, { ...tableColumns(schema.branches), firmName: schema.firms.name }),
       q.search ? ilike(schema.branches.name, `%${q.search}%`) : undefined,
     );
     const [{ total }] = await db.select({ total: count() }).from(schema.branches).where(where);
@@ -80,7 +82,7 @@ export async function orgRoutes(app: FastifyInstance) {
       .from(schema.branches)
       .innerJoin(schema.firms, eq(schema.firms.id, schema.branches.firmId))
       .where(where)
-      .orderBy(desc(schema.branches.isDefault), asc(schema.branches.name))
+      .orderBy(q.sortBy ? sortBy(q.sortBy, q.sortOrder, { ...tableColumns(schema.branches), firmName: schema.firms.name }, schema.branches.name) : desc(schema.branches.isDefault), asc(schema.branches.name))
       .limit(q.limit)
       .offset((q.page - 1) * q.limit);
     return ok({ rows: rows.map((r) => ({ ...r.branch, firmName: r.firmName })), total: Number(total), page: q.page, pageSize: q.limit }, 'Branches retrieved successfully');

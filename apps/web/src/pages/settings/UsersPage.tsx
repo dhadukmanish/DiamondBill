@@ -114,7 +114,7 @@ export default function UsersPage() {
   const { can, user: me } = useAuthStore();
   const remove = useSave({ invalidate: ['users', 'lookup'], onSuccess: () => setDel(null) });
   const columns: Column<any>[] = [
-    { key: 'name', header: 'Name', render: (r) => (<div className="flex items-center gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-lighter text-[12px] font-semibold text-primary-dark">{(r.firstName?.[0] ?? '') + (r.lastName?.[0] ?? '')}</span><div><div className="font-medium text-gray-900">{r.name}</div><div className="text-[12px] text-gray-500">{r.email}</div></div></div>) },
+    { key: 'name', header: 'Name', locked: true, sortValue: (r) => r.firstName, render: (r) => (<div className="flex items-center gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-lighter text-[12px] font-semibold text-primary-dark">{(r.firstName?.[0] ?? '') + (r.lastName?.[0] ?? '')}</span><div><div className="font-medium text-gray-900">{r.name}</div><div className="text-[12px] text-gray-500">{r.email}</div></div></div>) },
     { key: 'mobile', header: 'Mobile', render: (r) => r.mobile || '-' },
     { key: 'role', header: 'Role', render: (r) => <Badge color={r.role === 'super_admin' ? 'purple' : r.role === 'admin' ? 'blue' : 'gray'}>{r.role === 'super_admin' ? 'Super Admin' : r.role === 'admin' ? 'Admin' : 'User'}</Badge> },
     { key: 'userKind', header: 'Type', render: (r) => ({ system_user: 'System User', employee: 'Employee', user_and_employee: 'User & Employee' } as any)[r.userKind] ?? r.userKind, hidden: true },

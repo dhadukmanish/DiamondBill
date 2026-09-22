@@ -24,7 +24,7 @@ export function BranchPage() {
   const remove = useSave({ invalidate: ['branches', 'lookup'], onSuccess: () => setDel(null) });
   const submit = handleSubmit((v) => save.mutate({ method: edit ? 'put' : 'post', url: edit ? `/api/organizations/branches/${edit.id}` : '/api/organizations/branches', body: v }, { onError: (e) => applyApiErrors(e, setError as any) }));
   const columns: Column<any>[] = [
-    { key: 'name', header: 'Branch Name', sortable: true, render: (r) => <span className="flex items-center gap-2 font-medium text-gray-900">{r.name}{r.isDefault && <Badge color="blue">Default</Badge>}</span> },
+    { key: 'name', header: 'Branch Name', locked: true, render: (r) => <span className="flex items-center gap-2 font-medium text-gray-900">{r.name}{r.isDefault && <Badge color="blue">Default</Badge>}</span> },
     { key: 'firmName', header: 'Firm' },
     { key: 'address', header: 'Address', render: (r) => r.address || '-' },
     { key: 'users', header: 'Users', render: (r) => (r.userIds?.length ? `${r.userIds.length} user(s)` : '-') },
@@ -81,7 +81,7 @@ export function FiscalYearPage() {
   return (
     <>
       <h2 className="mb-4 text-[20px] font-semibold text-gray-900">Financial Year</h2>
-      <DataTable storageKey="fy" columns={columns} rows={q.data?.rows ?? []} total={q.data?.total} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r) => r.id} onRefresh={() => q.refetch()} hidePagination
+      <DataTable storageKey="fy" clientSide columns={columns} rows={q.data?.rows ?? []} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r) => r.id} onRefresh={() => q.refetch()} hidePagination
         actions={can('admin_financial_year', 'create') && <button className="btn-primary" onClick={() => setEdit(null)}><Plus className="h-4 w-4" /> Add Financial Year</button>}
         rowActions={(r) => (<span className="inline-flex gap-1"><button className="icon-btn h-7 w-7" onClick={() => setEdit(r)}><Pencil className="h-3.5 w-3.5" /></button><button className="icon-btn h-7 w-7 text-red-600" onClick={() => setDel(r)}><Trash2 className="h-3.5 w-3.5" /></button></span>)} />
       <Modal open={edit !== undefined} onClose={() => setEdit(undefined)} title={edit ? 'Edit Financial Year' : 'Add Financial Year'} footer={<><button className="btn-outline" onClick={() => setEdit(undefined)}>Cancel</button><button className="btn-primary" onClick={submit} disabled={save.isPending}>{save.isPending && <Spinner />} {edit ? 'Update' : 'Save'}</button></>}>
@@ -101,6 +101,7 @@ export function FiscalYearPage() {
 /* ============================ Currencies ============================ */
 export function CurrenciesPage() {
   const q = useCurrencies();
+  const [cstate, setCstate] = useListState({ sortOrder: 'asc' });
   const qc = useQueryClient();
   const [edit, setEdit] = useState<any | null | undefined>(undefined);
   const [del, setDel] = useState<any | null>(null);
@@ -120,7 +121,7 @@ export function CurrenciesPage() {
   return (
     <>
       <h2 className="mb-4 text-[20px] font-semibold text-gray-900">Currencies</h2>
-      <DataTable storageKey="currencies" columns={columns} rows={q.data ?? []} loading={q.isFetching} rowKey={(r) => r.id} onRefresh={() => q.refetch()} hidePagination hideSearch
+      <DataTable storageKey="currencies" clientSide state={cstate} onStateChange={setCstate} columns={columns} rows={q.data ?? []} loading={q.isFetching} rowKey={(r) => r.id} onRefresh={() => q.refetch()} hidePagination hideSearch
         actions={can('admin_currencies', 'create') && <button className="btn-primary" onClick={() => setEdit(null)}><Plus className="h-4 w-4" /> Add Currency</button>}
         rowActions={(r) => (<span className="inline-flex gap-1"><button className="icon-btn h-7 w-7" onClick={() => setEdit(r)}><Pencil className="h-3.5 w-3.5" /></button>{!r.isBaseCurrency && <button className="icon-btn h-7 w-7 text-red-600" onClick={() => setDel(r)}><Trash2 className="h-3.5 w-3.5" /></button>}</span>)} />
       <Modal open={edit !== undefined} onClose={() => setEdit(undefined)} size="sm" title={edit ? 'Edit Currency' : 'Add Currency'} footer={<><button className="btn-outline" onClick={() => setEdit(undefined)}>Cancel</button><button className="btn-primary" onClick={submit} disabled={save.isPending}>{save.isPending && <Spinner />} {edit ? 'Update' : 'Save'}</button></>}>

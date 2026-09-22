@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import { and, asc, desc, eq, ilike, or, sql, count, inArray } from 'drizzle-orm';
+import { and, asc, eq, ilike, or, sql, count, inArray } from 'drizzle-orm';
 import { db, schema } from '../db/client';
 import { contactSchema, CONTACT_TYPE_LABELS } from '@diamondbill/shared';
 import { parse } from '../lib/validate';
@@ -7,17 +7,10 @@ import { notFound, validation } from '../lib/errors';
 import { ok } from '../lib/respond';
 import { parseListQuery } from '../lib/list';
 import { logActivity } from '../services/activity';
+import { filterWhere, sortBy, tableColumns } from '../lib/filters';
 import { getSettings } from '../services/settings';
 
-const SORTABLE: Record<string, any> = {
-  created_at: schema.contacts.createdAt,
-  createdAt: schema.contacts.createdAt,
-  companyName: schema.contacts.companyName,
-  contactType: schema.contacts.contactType,
-  email: schema.contacts.email,
-  phone: schema.contacts.phone,
-  serialNo: schema.contacts.serialNo,
-};
+const COLS = { ...tableColumns(schema.contacts), created_at: schema.contacts.createdAt, city: sql`${schema.contacts.billingAddress}->>'city'`, state: sql`${schema.contacts.billingAddress}->>'state'` };
 
 export function maskPhone(p?: string | null) {
   if (!p) return p ?? null;
@@ -47,6 +40,7 @@ export async function contactRoutes(app: FastifyInstance) {
       eq(schema.contacts.tenantId, req.user.tenantId),
       q.firmId ? eq(schema.contacts.firmId, q.firmId) : undefined,
       types?.length ? inArray(schema.contacts.contactType, types) : undefined,
+      filterWhere((req.query as any).filters, COLS as any),
       q.search
         ? or(
             ilike(schema.contacts.companyName, `%${q.search}%`),
@@ -58,12 +52,11 @@ export async function contactRoutes(app: FastifyInstance) {
         : undefined,
     );
     const [{ total }] = await db.select({ total: count() }).from(schema.contacts).where(where);
-    const col = SORTABLE[q.sortBy ?? 'created_at'] ?? schema.contacts.createdAt;
     const rows = await db
       .select()
       .from(schema.contacts)
       .where(where)
-      .orderBy(q.sortOrder === 'asc' ? asc(col) : desc(col))
+      .orderBy(sortBy(q.sortBy, q.sortOrder, COLS as any, schema.contacts.createdAt))
       .limit(q.limit)
       .offset((q.page - 1) * q.limit);
     return ok(

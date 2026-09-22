@@ -107,7 +107,7 @@ function BulkForm({ open, onClose, firmId }: { open: boolean; onClose: () => voi
 }
 
 export default function SeriesPage() {
-  const [state, setState] = useListState({ limit: 50 });
+  const [state, setState] = useListState({ limit: 500, sortOrder: 'asc' });
   const firms = useFirms();
   const [firmId, setFirmId] = useState('');
   const [usedFor, setUsedFor] = useState('');
@@ -119,7 +119,7 @@ export default function SeriesPage() {
   const can = useAuthStore((s) => s.can);
   const remove = useSave({ invalidate: ['series'], onSuccess: () => setDel(null) });
   const columns = useMemo<Column<any>[]>(() => [
-    { key: 'usedFor', header: 'Used For', sortable: true, render: (r) => <span className="font-medium text-gray-900">{SERIES_USED_FOR_LABELS[r.usedFor as keyof typeof SERIES_USED_FOR_LABELS] ?? r.usedFor}</span> },
+    { key: 'usedFor', header: 'Used For', locked: true, render: (r) => <span className="font-medium text-gray-900">{SERIES_USED_FOR_LABELS[r.usedFor as keyof typeof SERIES_USED_FOR_LABELS] ?? r.usedFor}</span> },
     { key: 'seriesType', header: 'Type', render: (r) => (r.seriesType === 'regulated' ? <Badge color="blue">Regulated</Badge> : <Badge color="amber">Unregulated</Badge>) },
     { key: 'format', header: 'Series Format', render: (r) => <span className="font-mono">{r.format}</span> },
     { key: 'preview', header: 'Next Number', render: (r) => <span className="font-mono">{r.preview}</span> },
@@ -131,7 +131,7 @@ export default function SeriesPage() {
   return (
     <>
       <h2 className="mb-4 text-[20px] font-semibold text-gray-900">Series</h2>
-      <DataTable storageKey="series" columns={columns} rows={q.data?.rows ?? []} total={q.data?.total} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r) => r.id} onRefresh={() => q.refetch()}
+      <DataTable storageKey="series" clientSide hidePagination columns={columns} rows={q.data?.rows ?? []} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r) => r.id} onRefresh={() => q.refetch()}
         toolbar={<><Select size="sm" className="w-[190px]" value={firmId} onChange={setFirmId} placeholder="All Firms" options={(firms.data ?? []).map((f) => ({ value: f.id, label: f.name }))} /><Select size="sm" className="w-[190px]" value={usedFor} onChange={setUsedFor} placeholder="All Used For" options={usedForOpts} /></>}
         actions={can('crm_series', 'create') && (<><button className="btn-outline-primary" onClick={() => setBulk(true)}><Layers className="h-4 w-4" /> Add Multiple</button><button className="btn-primary" onClick={() => setEdit(null)}><Plus className="h-4 w-4" /> Add Series</button></>)}
         rowActions={(r) => (<span className="inline-flex gap-1"><button className="icon-btn h-7 w-7" onClick={() => setEdit(r)}><Pencil className="h-3.5 w-3.5" /></button><button className="icon-btn h-7 w-7 text-red-600" onClick={() => setDel(r)}><Trash2 className="h-3.5 w-3.5" /></button></span>)}

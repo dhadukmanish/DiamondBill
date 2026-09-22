@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyRequest } from 'fastify';
-import { and, asc, count, desc, eq, ilike, or, type SQL } from 'drizzle-orm';
+import { and, count, eq, ilike, or, type SQL } from 'drizzle-orm';
 import type { PgColumn, PgTable } from 'drizzle-orm/pg-core';
 import type { ZodSchema } from 'zod';
 import { db } from '../db/client';
@@ -7,6 +7,7 @@ import { parse } from './validate';
 import { notFound, validation } from './errors';
 import { ok } from './respond';
 import { parseListQuery } from './list';
+import { filterWhere, sortBy, tableColumns } from './filters';
 
 type AnyTable = PgTable & { id: PgColumn; tenantId: PgColumn; createdAt: PgColumn };
 
@@ -37,16 +38,17 @@ export interface CrudOptions<T extends AnyTable> {
 export function crudRoutes<T extends AnyTable>(app: FastifyInstance, o: CrudOptions<T>) {
   const t = o.table as any;
   const shape = o.shape ?? ((r: any) => r);
+  const cols = { ...tableColumns(t), ...(o.sortable ?? {}) };
 
   app.get(o.base, { preHandler: app.requirePermission(o.permission) }, async (req) => {
     const q = parseListQuery(req.query as any);
     const where = and(
       eq(t.tenantId, req.user.tenantId),
       q.search && o.searchColumns?.length ? or(...o.searchColumns.map((c) => ilike(c, `%${q.search}%`))) : undefined,
+      filterWhere((req.query as any).filters, cols),
       ...(o.filter ? o.filter(req, req.query as any) : []),
     );
-    const sortCol = (q.sortBy && o.sortable?.[q.sortBy]) || o.defaultSort || t.createdAt;
-    const order = q.sortOrder === 'asc' ? asc(sortCol) : desc(sortCol);
+    const order = sortBy(q.sortBy, q.sortOrder, cols, o.defaultSort || t.createdAt);
     if (o.listAll) {
       const rows = await db.select().from(t).where(where).orderBy(order);
       return ok({ rows: rows.map(shape), total: rows.length, page: 1, pageSize: rows.length }, `${o.label}s retrieved successfully`);

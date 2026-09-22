@@ -6,7 +6,7 @@ import type { ListState } from '@/components/data/DataTable';
 export interface Page<T> { rows: T[]; total: number; page: number; pageSize: number }
 
 export function listParams(s: ListState, extra: Record<string, unknown> = {}) {
-  return qs({ page: s.page, limit: s.limit, search: s.search, sortBy: s.sortBy, sortOrder: s.sortOrder, ...extra });
+  return qs({ page: s.page, limit: s.limit, search: s.search, sortBy: s.sortBy, sortOrder: s.sortOrder, filters: s.filters?.length ? JSON.stringify(s.filters) : undefined, ...extra });
 }
 
 /** Generic paginated list */

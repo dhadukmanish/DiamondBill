@@ -3,3 +3,4 @@ export * from './permissions.js';
 export * from './nav.js';
 export * from './schemas/index.js';
 export * from './api.js';
+export * from './filters.js';

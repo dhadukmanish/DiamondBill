@@ -7,6 +7,7 @@ import { Combobox, ConfirmDialog, Field, Modal, Select, Spinner, Switch, TextAre
 import { api, qs } from '@/lib/api';
 import { applyApiErrors, useSave } from '@/lib/queries';
 import { useAuthStore } from '@/store/auth';
+import type { FilterFieldDef } from '@diamondbill/shared';
 
 /** Declarative field for the generated form. */
 export interface MasterField {
@@ -48,6 +49,8 @@ export interface MasterConfig<T = any> {
   invalidate?: string[];
   storageKey?: string;
   hideSearch?: boolean;
+  /** filter builder fields (defaults to all columns as text) */
+  filterFields?: FilterFieldDef[] | false;
   /** rows shown from a static/derived list instead of fetching */
   rowFilter?: (rows: T[]) => T[];
 }
@@ -109,7 +112,7 @@ export function MasterForm({ cfg, open, onClose, row }: { cfg: MasterConfig; ope
 }
 
 export function MasterPage({ cfg, children }: { cfg: MasterConfig; children?: ReactNode }) {
-  const [state, setState] = useListState({ limit: 500 });
+  const [state, setState] = useListState({ limit: 500, sortOrder: 'asc' });
   const q = useMasterList(cfg, state);
   const [edit, setEdit] = useState<any | null | undefined>(undefined);
   const [del, setDel] = useState<any | null>(null);
@@ -120,7 +123,7 @@ export function MasterPage({ cfg, children }: { cfg: MasterConfig; children?: Re
     <>
       <h2 className="mb-4 text-[20px] font-semibold text-gray-900">{cfg.title}</h2>
       {children}
-      <DataTable storageKey={cfg.storageKey ?? cfg.queryKey} columns={cfg.columns} rows={rows} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r: any) => r.id} onRefresh={() => q.refetch()} hidePagination hideSearch={cfg.hideSearch}
+      <DataTable storageKey={cfg.storageKey ?? cfg.queryKey} columns={cfg.columns} rows={rows} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r: any) => r.id} onRefresh={() => q.refetch()} hidePagination hideSearch={cfg.hideSearch} clientSide filterFields={cfg.filterFields}
         toolbar={cfg.toolbar}
         onRowClick={(r: any) => can(cfg.permission, 'update') && (cfg.canEdit?.(r) ?? true) && setEdit(r)}
         actions={<>{cfg.extraActions}{can(cfg.permission, 'create') && <button className="btn-primary" onClick={() => setEdit(null)}><Plus className="h-4 w-4" /> Add {cfg.label}</button>}</>}

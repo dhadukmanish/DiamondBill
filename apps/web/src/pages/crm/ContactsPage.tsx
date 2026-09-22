@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { Copy, Pencil, Plus, Trash2, X } from 'lucide-react';
-import { CONTACT_TYPES, CONTACT_TYPE_LABELS } from '@diamondbill/shared';
+import { CONTACT_TYPES, CONTACT_TYPE_LABELS, type FilterFieldDef } from '@diamondbill/shared';
 import { DataTable, useListState, type Column } from '@/components/data/DataTable';
 import { CustomFieldInputs } from '@/components/data/CustomFieldInputs';
 import { Badge, Checkbox, Combobox, ConfirmDialog, Field, FormSection, Modal, RadioGroup, Select, Spinner, Tabs, TextArea, TextInput } from '@/components/ui';
@@ -146,8 +146,24 @@ export function ContactForm({ open, onClose, row, onSaved }: { open: boolean; on
   );
 }
 
+const filterFields: FilterFieldDef[] = [
+  { key: 'companyName', label: 'Contact', type: 'text' },
+  { key: 'contactPerson', label: 'Contact Person', type: 'text' },
+  { key: 'contactType', label: 'Type', type: 'select', options: CONTACT_TYPES.map((t) => ({ value: t, label: CONTACT_TYPE_LABELS[t] })) },
+  { key: 'email', label: 'Email', type: 'text' },
+  { key: 'phone', label: 'Mobile', type: 'text' },
+  { key: 'gstin', label: 'GSTIN', type: 'text' },
+  { key: 'gstTreatment', label: 'GST Treatment', type: 'select', options: GST_TREATMENTS },
+  { key: 'city', label: 'City', type: 'text' },
+  { key: 'state', label: 'State', type: 'text' },
+  { key: 'serialNo', label: 'Serial No', type: 'number' },
+  { key: 'paymentTermDays', label: 'Payment Terms (days)', type: 'number' },
+  { key: 'dob', label: 'DOB', type: 'date' },
+  { key: 'createdAt', label: 'Created At', type: 'date' },
+];
+
 export default function ContactsPage() {
-  const [state, setState] = useListState({ sortBy: 'created_at' });
+  const [state, setState] = useListState({ sortBy: 'createdAt' });
   const [type, setType] = useState('');
   const q = useList<any>('contacts', '/api/crm/contacts', state, { contactType: type });
   const [edit, setEdit] = useState<any | null | undefined>(undefined);
@@ -157,22 +173,22 @@ export default function ContactsPage() {
   const remove = useSave({ invalidate: ['contacts', 'lookup'], onSuccess: () => setDel(null) });
   const typeColor: Record<string, any> = { customer: 'green', vendor: 'amber', customer_vendor: 'purple', broker: 'blue', contact: 'gray' };
   const columns: Column<any>[] = [
-    { key: 'serialNo', header: 'Sr. No', sortable: true, width: 80, render: (r) => r.serialNo },
-    { key: 'companyName', header: 'Company / Name', sortable: true, render: (r) => (<div><div className="font-medium text-gray-900">{r.companyName}</div>{r.contactPerson && <div className="text-[12px] text-gray-500">{r.contactPerson}</div>}</div>) },
-    { key: 'contactType', header: 'Type', sortable: true, render: (r) => <Badge color={typeColor[r.contactType]}>{r.contactTypeLabel}</Badge> },
-    { key: 'phone', header: 'Mobile', sortable: true, render: (r) => (r.phone ? `${r.phoneCode ?? ''} ${r.phoneMasked}` : '-') },
-    { key: 'email', header: 'Email', sortable: true, render: (r) => r.email || '-' },
+    { key: 'serialNo', header: 'Sr. No', width: 80, render: (r) => r.serialNo },
+    { key: 'companyName', header: 'Company / Name', locked: true, render: (r) => (<div><div className="font-medium text-gray-900">{r.companyName}</div>{r.contactPerson && <div className="text-[12px] text-gray-500">{r.contactPerson}</div>}</div>) },
+    { key: 'contactType', header: 'Type', render: (r) => <Badge color={typeColor[r.contactType]}>{r.contactTypeLabel}</Badge> },
+    { key: 'phone', header: 'Mobile', render: (r) => (r.phone ? `${r.phoneCode ?? ''} ${r.phoneMasked}` : '-') },
+    { key: 'email', header: 'Email', render: (r) => r.email || '-' },
     { key: 'gstin', header: 'GSTIN', render: (r) => r.gstin || '-' },
     { key: 'city', header: 'City', render: (r) => r.billingAddress?.city || '-', hidden: true },
     { key: 'paymentTermDays', header: 'Payment Terms', render: (r) => (r.paymentTermDays != null ? `${r.paymentTermDays} days` : '-'), hidden: true },
-    { key: 'createdAt', header: 'Created At', sortable: true, render: (r) => fmtDate(r.createdAt, true), hidden: true },
+    { key: 'createdAt', header: 'Created At', render: (r) => fmtDate(r.createdAt, true), hidden: true },
   ];
   return (
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-[20px] font-semibold text-gray-900">Contacts</h2>
       </div>
-      <DataTable storageKey="contacts" columns={columns} rows={q.data?.rows ?? []} total={q.data?.total} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r) => r.id} onRefresh={() => q.refetch()} selectable selected={selected} onSelectedChange={setSelected} onImport={() => {}}
+      <DataTable storageKey="contacts" searchPlaceholder="Search by name, email, company, mobile, contact person..." filterFields={filterFields} columns={columns} rows={q.data?.rows ?? []} total={q.data?.total} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r) => r.id} onRefresh={() => q.refetch()} selectable selected={selected} onSelectedChange={setSelected} onImport={() => {}}
         onRowClick={(r) => can('crm_contacts', 'update') && setEdit(r)}
         toolbar={<Select size="sm" className="w-[190px]" value={type} onChange={setType} placeholder="All Types" options={CONTACT_TYPES.map((t) => ({ value: t, label: CONTACT_TYPE_LABELS[t] }))} />}
         actions={can('crm_contacts', 'create') && <button className="btn-primary" onClick={() => setEdit(null)}><Plus className="h-4 w-4" /> New Contact</button>}

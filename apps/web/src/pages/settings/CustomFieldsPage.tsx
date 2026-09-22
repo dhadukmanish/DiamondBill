@@ -156,7 +156,7 @@ export default function CustomFieldsPage() {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-[20px] font-semibold text-gray-900">Custom Field</h2>
       </div>
-      <DataTable storageKey="custom-fields" columns={columns} rows={rows} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r) => r.id} onRefresh={() => q.refetch()} hidePagination
+      <DataTable storageKey="custom-fields" clientSide columns={columns} rows={rows} loading={q.isFetching} state={state} onStateChange={setState} rowKey={(r) => r.id} onRefresh={() => q.refetch()} hidePagination
         toolbar={<Select size="sm" className="w-[220px]" value={moduleName} onChange={setModuleName} placeholder="All Modules" options={CUSTOM_FIELD_MODULES.map((m) => ({ value: m.name, label: m.label }))} />}
         actions={can('crm_custom_fields', 'create') && (<><button className="btn-outline-primary" onClick={() => setAuto(true)}><Sparkles className="h-4 w-4" /> Auto Import Property</button><button className="btn-primary" onClick={() => setPicker(true)}><Plus className="h-4 w-4" /> Add Field</button></>)}
         rowActions={(r) => (<span className="inline-flex gap-1"><button className="icon-btn h-7 w-7" onClick={() => setEditor({ row: r })}><Pencil className="h-3.5 w-3.5" /></button><button className="icon-btn h-7 w-7 text-red-600" onClick={() => setDel(r)}><Trash2 className="h-3.5 w-3.5" /></button></span>)}
