@@ -8,3 +8,6 @@ dist
 coverage
 .turbo
 apps/api/uploads
+
+# Jetro plugin local state — contains credentials, never commit
+.jetro/
