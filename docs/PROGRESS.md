@@ -55,9 +55,6 @@ Verified in **production** (https://md.pratishthabridal.in) on 2026-09-23:
   "fix" Coolify — it would fight nginx for :80/:443 and take down live sites and mail.
 - **The VPS is shared.** ~15 live sites + a mail server + certbot. Read the warning at the top
   of `docs/DEPLOY.md` before touching anything on it.
-- `valentinesjewels.com` returns 404 and `www.valentinesjewels.com` does not connect. **Not
-  baselined before the nginx change**, so it is unknown whether this is pre-existing. Our change
-  adds a server block for a different hostname and cannot affect it, but it is worth a look.
 - Production **uploads are not backed up** (`api-uploads` volume), and the database has no
   backup beyond the weekly Hostinger VPS snapshot.
 - Git prints many `LF will be replaced by CRLF` warnings. `.gitattributes` now pins LF for
@@ -75,6 +72,7 @@ and use the `repo-scout` subagent to map the existing pattern.
 ## Session log
 
 <!-- newest first, one line each -->
+- **2026-09-23** — Removed the dead `valentinesjewels.com` from the VPS (site is on Shopify now): nginx config, expired cert, 309 MB webroot, and its 16 MB MySQL database + user. No backup taken, at the owner's instruction.
 - **2026-09-23** — Deployed to production: https://md.pratishthabridal.in (docker compose behind host nginx + certbot); `/deploy` wired up.
 - **2026-09-23** — Added agent context: CLAUDE.md, docs/, `.claude/agents`, `.claude/commands`; `.jetro/` gitignored.
 - **2026-09-23** — DataTable filters/sort/column-order verified in browser, committed `c03d4dd`.
