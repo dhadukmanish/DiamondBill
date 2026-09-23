@@ -72,6 +72,7 @@ and use the `repo-scout` subagent to map the existing pattern.
 ## Session log
 
 <!-- newest first, one line each -->
+- **2026-09-23** — Removed `clothing.` / `fashion.` / `bus.pratishthabridal.com` from the VPS (nginx configs, 3 certs, `fashion_pratishthabridal` + `bus` databases and their users). Their webroots were already gone before the cleanup. No backup taken, at the owner's instruction. DNS CNAMEs for `clothing` and `fashion` still need removing by hand in hPanel.
 - **2026-09-23** — Removed the dead `valentinesjewels.com` from the VPS (site is on Shopify now): nginx config, expired cert, 309 MB webroot, and its 16 MB MySQL database + user. No backup taken, at the owner's instruction.
 - **2026-09-23** — Deployed to production: https://md.pratishthabridal.in (docker compose behind host nginx + certbot); `/deploy` wired up.
 - **2026-09-23** — Added agent context: CLAUDE.md, docs/, `.claude/agents`, `.claude/commands`; `.jetro/` gitignored.
