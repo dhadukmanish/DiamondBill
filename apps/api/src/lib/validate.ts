@@ -1,7 +1,8 @@
-import type { ZodSchema } from 'zod';
+import type { ZodTypeAny, z } from 'zod';
 import { AppError } from './errors';
 
-export function parse<T>(schema: ZodSchema<T>, input: unknown): T {
+/** Validate with zod; returns the parsed (output) type so defaults are non-optional. */
+export function parse<S extends ZodTypeAny>(schema: S, input: unknown): z.output<S> {
   const r = schema.safeParse(input);
   if (!r.success) {
     const details = r.error.issues.map((i) => ({ code: i.code, path: i.path, message: i.message, expected: (i as any).expected }));

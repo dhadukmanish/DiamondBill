@@ -9,6 +9,10 @@ import { userRoutes } from './users';
 import { settingsRoutes } from './settings';
 import { prefRoutes } from './prefs';
 import { masterRoutes } from './masters';
+import { productRoutes } from './products';
+import { certifiedRoutes } from './certified';
+import { stockRoutes } from './stock';
+import { rapaportRoutes } from './rapaport';
 
 export async function registerRoutes(app: FastifyInstance) {
   await app.register(authRoutes);
@@ -21,4 +25,8 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(settingsRoutes);
   await app.register(prefRoutes);
   await app.register(masterRoutes);
+  await app.register(productRoutes);
+  await app.register(certifiedRoutes);
+  await app.register(stockRoutes);
+  await app.register(rapaportRoutes);
 }

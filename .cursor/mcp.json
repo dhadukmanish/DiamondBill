@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "jetro": {
+      "type": "stdio",
+      "command": "C:\\Users\\PC-8\\.jetro\\runtime\\node-win32-x64.exe",
+      "args": [
+        "C:\\Users\\PC-8\\.jetro\\mcp-server\\index.js"
+      ],
+      "env": {
+        "JET_WORKSPACE": "e:\\DIVYESH\\DiamondBill",
+        "JET_API_URL": "https://api.jetro.ai",
+        "PATH": "C:\\Users\\PC-8\\.jetro\\runtime;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Tailscale\\;C:\\Program Files\\Microsoft SQL Server\\170\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\170\\Tools\\Binn\\;C:\\Program Files (x86)\\Microsoft SQL Server\\170\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\Client SDK\\ODBC\\180\\Tools\\Binn\\;C:\\Program Files\\Microsoft SQL Server\\170\\DTS\\Binn\\;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Amazon\\AWSCLIV2\\;C:\\Users\\PC-8\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\PC-8\\AppData\\Roaming\\npm;C:\\php;C:\\Users\\PC-8\\.dotnet\\tools;C:\\Users\\PC-8\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\PC-8\\AppData\\Local\\Microsoft\\WindowsApps;E:\\DO_NOT_REMOVE\\Antigravity\\bin;C:\\Users\\PC-8\\.dotnet\\tools;C:\\terraform;C:\\Program Files\\nodejs\\;C:\\Program Files\\Docker\\Docker\\resources\\bin;C:\\Program Files\\dotnet\\;C:\\Users\\PC-8\\AppData\\Local\\Microsoft\\WindowsApps;C:\\php;C:\\Users\\PC-8\\.dotnet\\tools;C:\\Users\\PC-8\\AppData\\Local\\JetBrains\\Toolbox\\scripts;C:\\Users\\PC-8\\AppData\\Local\\Microsoft\\WindowsApps;E:\\DO_NOT_REMOVE\\Antigravity\\bin;E:\\DIVYESH\\Windsurf\\bin;C:\\Users\\PC-8\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;E:\\DIVYESH\\cursor\\resources\\app\\bin;C:\\Users\\PC-8\\AppData\\Local\\Programs\\Ollama;C:\\Users\\PC-8\\AppData\\Local\\Python\\bin;C:\\Users\\PC-8\\AppData\\Roaming\\npm;C:\\Users\\PC-8\\.dotnet\\tools"
+      }
+    }
+  }
+}

@@ -82,6 +82,12 @@ type Layout = { key: string; visible: boolean }[];
 
 const defaultLayout = (columns: Column<any>[]): Layout => [...columns.filter((c) => c.locked), ...columns.filter((c) => !c.locked)].map((c) => ({ key: c.key, visible: c.locked ? true : !c.hidden }));
 
+/** Client-side quick search: matches any string/number field of the row (case-insensitive). */
+function applyClientSearch<T>(rows: T[], search?: string) {
+  const q = search?.trim().toLowerCase();
+  if (!q) return rows;
+  return rows.filter((r: any) => Object.values(r).some((v) => (typeof v === 'string' || typeof v === 'number') && String(v).toLowerCase().includes(q)));
+}
 function applyClientFilters<T>(rows: T[], filters: ListFilter[]) {
   if (!filters.length) return rows;
   return rows.filter((r: any) =>
@@ -275,7 +281,7 @@ export function DataTable<T>({ columns, rows, total, loading, state, onStateChan
   const activeFilters = state?.filters ?? [];
 
   /* ---- client-side processing ---- */
-  const shown = useMemo(() => (clientSide ? applyClientSort(applyClientFilters(rows, activeFilters), columns, state?.sortBy, state?.sortOrder) : rows), [rows, clientSide, activeFilters, state?.sortBy, state?.sortOrder, columns]);
+  const shown = useMemo(() => (clientSide ? applyClientSort(applyClientFilters(applyClientSearch(rows, state?.search), activeFilters), columns, state?.sortBy, state?.sortOrder) : rows), [rows, clientSide, activeFilters, state?.search, state?.sortBy, state?.sortOrder, columns]);
 
   const allIds = shown.map(rowKey);
   const allChecked = allIds.length > 0 && allIds.every((id) => selected.includes(id));
@@ -287,6 +293,7 @@ export function DataTable<T>({ columns, rows, total, loading, state, onStateChan
   const from = count === 0 ? 0 : (page - 1) * limit + 1;
   const to = Math.min(count, page * limit);
   const pages = Math.max(1, Math.ceil(count / limit));
+  const visible = clientSide && !hidePagination ? shown.slice((page - 1) * limit, page * limit) : shown;
 
   const sortIcon = (c: Column<T>) => {
     if (c.sortable === false) return null;
@@ -348,13 +355,13 @@ export function DataTable<T>({ columns, rows, total, loading, state, onStateChan
             </tr>
           </thead>
           <tbody className="divide-y divide-line">
-            {loading && shown.length === 0 && (
+            {loading && visible.length === 0 && (
               <tr><td colSpan={cols.length + 2} className="py-12 text-center text-gray-500"><Spinner className="inline h-5 w-5" /></td></tr>
             )}
-            {!loading && shown.length === 0 && (
+            {!loading && visible.length === 0 && (
               <tr><td colSpan={cols.length + 2}><EmptyState title={emptyTitle} description={emptyDescription} /></td></tr>
             )}
-            {shown.map((r, i) => {
+            {visible.map((r, i) => {
               const id = rowKey(r);
               const isSel = selected.includes(id);
               return (

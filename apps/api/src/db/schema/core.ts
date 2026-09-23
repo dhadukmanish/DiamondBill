@@ -281,7 +281,7 @@ export const activityLogs = pgTable(
     id: id(),
     tenantId: uuid('tenant_id').notNull().references(() => tenants.id, { onDelete: 'cascade' }),
     entityType: text('entity_type').notNull(),
-    entityId: uuid('entity_id').notNull(),
+    entityId: uuid('entity_id'),
     action: text('action').notNull(), // created | updated | deleted | status_changed | ...
     description: text('description').notNull(),
     meta: jsonb('meta').notNull().default({}),

@@ -19,6 +19,16 @@ const CustomFieldsPage = lazy(() => import('@/pages/settings/CustomFieldsPage'))
 const GeneralSettingsPage = lazy(() => import('@/pages/settings/GeneralSettingsPage'));
 const ChartOfAccounts = lazy(() => import('@/pages/accounting/ChartOfAccounts'));
 const ContactsPage = lazy(() => import('@/pages/crm/ContactsPage'));
+const ProductsPage = lazy(() => import('@/pages/inventory/ProductsPage'));
+const CertifiedProductsPage = lazy(() => import('@/pages/inventory/CertifiedProductsPage'));
+const OpeningStockPage = lazy(() => import('@/pages/inventory/OpeningStockPage'));
+const BarcodeSettingsPage = lazy(() => import('@/pages/inventory/BarcodeSettingsPage'));
+const SP = (name: string) => lazy(() => import('@/pages/inventory/StockPages').then((m: any) => ({ default: m[name] })));
+const SD = (name: string) => lazy(() => import('@/pages/inventory/StockDocsPages').then((m: any) => ({ default: m[name] })));
+const RP = (name: string) => lazy(() => import('@/pages/inventory/RapaportPages').then((m: any) => ({ default: m[name] })));
+const StockViewPage = SP('StockViewPage'), BranchWiseStockPage = SP('BranchWiseStockPage'), MonthWiseSummaryPage = SP('MonthWiseSummaryPage'), StockTallyPage = SP('StockTallyPage');
+const StockAdjustmentsPage = SD('StockAdjustmentsPage'), StockTransfersPage = SD('StockTransfersPage'), ItemTransfersPage = SD('ItemTransfersPage');
+const RapaportPricePage = RP('RapaportPricePage'), RapaportAdditionalBackPage = RP('RapaportAdditionalBackPage'), RapaportCustomSizePage = RP('RapaportCustomSizePage');
 const MP = (name: string) => lazy(() => import('@/pages/settings/MasterPages').then((m: any) => ({ default: m[name] })));
 const TaxesPage = MP('TaxesPage'), TdsPage = MP('TdsPage'), TcsPage = MP('TcsPage'), UnitsPage = MP('UnitsPage'), CategoriesPage = MP('CategoriesPage'), LabsPage = MP('LabsPage'), SalesPersonsPage = MP('SalesPersonsPage'), TermsPage = MP('TermsPage'), ChequeBooksPage = MP('ChequeBooksPage'), CarriersPage = MP('CarriersPage'), ShipmentStatusesPage = MP('ShipmentStatusesPage'), ProcessesPage = MP('ProcessesPage'), PriceListsPage = MP('PriceListsPage'), ProductNameTemplatesPage = MP('ProductNameTemplatesPage'), PaymentModesPage = MP('PaymentModesPage'), PaymentTermsPage = MP('PaymentTermsPage');
 
@@ -45,6 +55,15 @@ export default function App() {
               <Route path="/modules/crm/contacts" element={<ContactsPage />} />
               <Route path="/modules/accounting/masters/chart-of-accounts" element={<ChartOfAccounts />} />
               <Route path="/modules/accounting/product-process/processes" element={<ProcessesPage />} />
+              <Route path="/modules/accounting/products" element={<ProductsPage />} />
+              <Route path="/modules/accounting/certified-products" element={<CertifiedProductsPage />} />
+              <Route path="/modules/accounting/inventory/stock-view" element={<StockViewPage />} />
+              <Route path="/modules/accounting/inventory/branch-wise-stock-view" element={<BranchWiseStockPage />} />
+              <Route path="/modules/accounting/inventory/month-wise-stock-summary" element={<MonthWiseSummaryPage />} />
+              <Route path="/modules/accounting/inventory/adjustment" element={<StockAdjustmentsPage />} />
+              <Route path="/modules/accounting/inventory/stock-tally" element={<StockTallyPage />} />
+              <Route path="/modules/accounting/inventory/transfer" element={<StockTransfersPage />} />
+              <Route path="/modules/accounting/inventory/item-transfer" element={<ItemTransfersPage />} />
               <Route path="/modules/accounting/*" element={<ComingSoon />} />
               <Route path="/modules/diamond/*" element={<ComingSoon />} />
               <Route path="/modules/settings" element={<SettingsHub />} />
@@ -72,6 +91,12 @@ export default function App() {
                 <Route path="product-name-templates" element={<ProductNameTemplatesPage />} />
                 <Route path="payment-modes" element={<PaymentModesPage />} />
                 <Route path="payment-terms" element={<PaymentTermsPage />} />
+                <Route path="products" element={<ProductsPage />} />
+                <Route path="opening-stock" element={<OpeningStockPage />} />
+                <Route path="rapaport-prices" element={<RapaportPricePage />} />
+                <Route path="rapaport-additional-back" element={<RapaportAdditionalBackPage />} />
+                <Route path="rapaport-custom-size" element={<RapaportCustomSizePage />} />
+                <Route path="product-barcode" element={<BarcodeSettingsPage />} />
                 <Route path="*" element={<ComingSoon />} />
               </Route>
               <Route path="*" element={<NotFound />} />

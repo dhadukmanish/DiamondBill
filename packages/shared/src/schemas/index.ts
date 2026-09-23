@@ -6,3 +6,4 @@ export * from './contacts.js';
 export * from './customFields.js';
 export * from './users.js';
 export * from './masters.js';
+export * from './inventory.js';
