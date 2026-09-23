@@ -3,7 +3,7 @@
 **Purpose:** first thing an agent reads in a new session. Keep it short and current.
 Update it at the end of every work package (`/handoff`).
 
-Last updated: **2026-09-23** · HEAD: `42590bb` · branch `main`, in sync with origin.
+Last updated: **2026-09-23** · HEAD: `7512346` · branch `main`, in sync with origin.
 
 **Live:** https://md.pratishthabridal.in — see [DEPLOY.md](DEPLOY.md). Deploy with `/deploy`.
 
@@ -17,7 +17,7 @@ Last updated: **2026-09-23** · HEAD: `42590bb` · branch `main`, in sync with o
 | 1 | Masters — taxes, TDS/TCS, units, categories, labs, sales persons, terms, cheque books, carriers, shipment statuses, payment modes/terms, processes, price lists, name templates | ✅ done (`cf4e95a`) |
 | — | DataTable — dynamic filter builder, saved filters, column reorder, header sorting | ✅ done (`c03d4dd`) |
 | — | Production deploy — Docker images, compose stack, host-nginx proxy, TLS, `/deploy` | ✅ done (`42590bb`) |
-| 2 | Inventory — products, certified products, FIFO stock lots, Rapaport pricing, stock views/adjustments/transfers | ⬜ not started |
+| 2 | Inventory — products, certified products, FIFO stock lots, Rapaport pricing, stock views/adjustments/transfers | ✅ done (`7512346`), deployed |
 | 3 | Transactions — memos, bills, invoices, notes, payments with allocations, auto journal posting, packages & shipments, lab issue/return | ⬜ not started |
 | 4 | Reports & dashboard, print template builder, import wizard | ⬜ not started |
 
@@ -46,6 +46,9 @@ Verified in **production** (https://md.pratishthabridal.in) on 2026-09-23:
 - `web` bound to `127.0.0.1:8091` only; `db` not published at all
 - Other sites on the box unaffected: ck 302, studio 200, pratishthabridal.com 200,
   dtechintegrity 200, motiwala 200, viratenterprise 301→www 200
+- Phase 2 endpoints live: `products`, `certified-products`, `inventory/stock-view`,
+  `inventory/adjustments`, `inventory/transfers`, `rapaport/prices`, `masters/barcode-settings`
+  — all 200, all under `/api/accounting/…` (**not** `/api/inventory/…`)
 
 ## Known issues / open decisions
 
@@ -66,12 +69,19 @@ Verified in **production** (https://md.pratishthabridal.in) on 2026-09-23:
 
 ## Next up
 
-**Phase 2 — Inventory.** Nothing in flight. Before writing code, read `docs/CONVENTIONS.md`
-and use the `repo-scout` subagent to map the existing pattern.
+**Phase 3 — Transactions** (memos, bills, invoices, notes, payments with allocations, auto
+journal posting, packages & shipments, lab issue/return). Nothing in flight. Before writing
+code, read `docs/CONVENTIONS.md` and use the `repo-scout` subagent to map the existing pattern.
+
+Phase 2 shipped with **no seed data and no UI test** — the inventory tables are empty in
+production and the pages have only been checked for HTTP 200, not exercised. Worth a pass with
+the `qa-verify` subagent before building on top of them.
 
 ## Session log
 
 <!-- newest first, one line each -->
+- **2026-09-23** — Deployed Phase 2 (`7512346`) to production. Migrations `0002_inventory` + `0003_activity_entity_nullable` applied; all 7 new `/api/accounting/*` endpoints return 200.
+- **2026-09-23** — Removed `mapi.` + `milk-backend.pratishthabridal.com` (nginx, certs, `/var/www/milk-delivery`, Mongo `InventorySystem`) and 5 orphaned `*.divyeshsarvaiya.com` nginx blocks. `/var/www/motiwala.com` (4.3 GB) and MySQL `motiwala_new` deliberately kept.
 - **2026-09-23** — Removed `clothing.` / `fashion.` / `bus.pratishthabridal.com` from the VPS (nginx configs, 3 certs, `fashion_pratishthabridal` + `bus` databases and their users). Their webroots were already gone before the cleanup. No backup taken, at the owner's instruction. DNS CNAMEs for `clothing` and `fashion` still need removing by hand in hPanel.
 - **2026-09-23** — Removed the dead `valentinesjewels.com` from the VPS (site is on Shopify now): nginx config, expired cert, 309 MB webroot, and its 16 MB MySQL database + user. No backup taken, at the owner's instruction.
 - **2026-09-23** — Deployed to production: https://md.pratishthabridal.in (docker compose behind host nginx + certbot); `/deploy` wired up.
