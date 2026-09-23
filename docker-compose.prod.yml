@@ -1,0 +1,66 @@
+# Production stack. Runs on the Hostinger VPS at /opt/diamondbill.
+#
+# The host nginx owns :80/:443 and serves ~15 other sites plus mail, so this stack
+# binds ONLY to 127.0.0.1 and nginx reverse-proxies md.pratishthabridal.in to it.
+# Nothing here is reachable from the internet directly; `db` is not published at all.
+#
+# Required env (in /opt/diamondbill/.env — never committed):
+#   POSTGRES_PASSWORD, JWT_SECRET, CORS_ORIGIN
+# Optional:
+#   WEB_PORT (default 8091), RUN_SEED, SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD, SEED_TENANT_SLUG
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: diamondbill
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: diamondbill
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U diamondbill -d diamondbill']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgres://diamondbill:${POSTGRES_PASSWORD}@db:5432/diamondbill
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN:?set CORS_ORIGIN}
+      UPLOAD_DIR: /app/apps/api/uploads
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # First deploy only — flip back to false afterwards.
+      RUN_SEED: ${RUN_SEED:-false}
+      SEED_TENANT_SLUG: ${SEED_TENANT_SLUG:-demo}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@diamondbill.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-Admin@1234}
+    volumes:
+      - api-uploads:/app/apps/api/uploads
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api
+    # Loopback only — the host nginx proxies md.pratishthabridal.in here.
+    ports:
+      - '127.0.0.1:${WEB_PORT:-8091}:80'
+
+volumes:
+  db-data:
+  api-uploads:
