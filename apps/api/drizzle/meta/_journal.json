@@ -29,6 +29,13 @@
       "when": 1790169439562,
       "tag": "0003_activity_entity_nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790254382482,
+      "tag": "0004_trading",
+      "breakpoints": true
     }
   ]
 }

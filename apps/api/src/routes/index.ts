@@ -13,6 +13,8 @@ import { productRoutes } from './products';
 import { certifiedRoutes } from './certified';
 import { stockRoutes } from './stock';
 import { rapaportRoutes } from './rapaport';
+import { purchaseRoutes } from './purchase';
+import { salesRoutes } from './sales';
 
 export async function registerRoutes(app: FastifyInstance) {
   await app.register(authRoutes);
@@ -29,4 +31,6 @@ export async function registerRoutes(app: FastifyInstance) {
   await app.register(certifiedRoutes);
   await app.register(stockRoutes);
   await app.register(rapaportRoutes);
+  await app.register(purchaseRoutes);
+  await app.register(salesRoutes);
 }

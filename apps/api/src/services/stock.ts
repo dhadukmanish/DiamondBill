@@ -113,6 +113,30 @@ export async function memoIn(k: StockKey, p: { date: string; qty: number } & Sto
   return mv;
 }
 
+/** Purchase Memo commitment: qty "on order" — informational only, doesn't touch qtyOnHand. */
+export async function poCommit(k: StockKey, p: { date: string; qty: number } & StockRef, tx: Tx = db) {
+  const [mv] = await tx.insert(schema.stockMovements).values({ tenantId: k.tenantId, firmId: k.firmId, branchId: k.branchId, productItemId: k.productItemId, movementDate: p.date, kind: 'po_commit', qty: s4(p.qty), refType: p.refType, refId: p.refId ?? null, refNumber: p.refNumber ?? null, note: p.note ?? null, createdBy: p.createdBy ?? null }).returning();
+  await bump(tx, k, { poCommitted: p.qty });
+  return mv;
+}
+export async function poRelease(k: StockKey, p: { date: string; qty: number } & StockRef, tx: Tx = db) {
+  const [mv] = await tx.insert(schema.stockMovements).values({ tenantId: k.tenantId, firmId: k.firmId, branchId: k.branchId, productItemId: k.productItemId, movementDate: p.date, kind: 'po_release', qty: s4(p.qty), refType: p.refType, refId: p.refId ?? null, refNumber: p.refNumber ?? null, note: p.note ?? null, createdBy: p.createdBy ?? null }).returning();
+  await bump(tx, k, { poCommitted: -p.qty });
+  return mv;
+}
+
+/** Sales Memo commitment: qty "on order" for a customer — informational only, doesn't touch qtyOnHand. */
+export async function soCommit(k: StockKey, p: { date: string; qty: number } & StockRef, tx: Tx = db) {
+  const [mv] = await tx.insert(schema.stockMovements).values({ tenantId: k.tenantId, firmId: k.firmId, branchId: k.branchId, productItemId: k.productItemId, movementDate: p.date, kind: 'so_commit', qty: s4(p.qty), refType: p.refType, refId: p.refId ?? null, refNumber: p.refNumber ?? null, note: p.note ?? null, createdBy: p.createdBy ?? null }).returning();
+  await bump(tx, k, { soCommitted: p.qty });
+  return mv;
+}
+export async function soRelease(k: StockKey, p: { date: string; qty: number } & StockRef, tx: Tx = db) {
+  const [mv] = await tx.insert(schema.stockMovements).values({ tenantId: k.tenantId, firmId: k.firmId, branchId: k.branchId, productItemId: k.productItemId, movementDate: p.date, kind: 'so_release', qty: s4(p.qty), refType: p.refType, refId: p.refId ?? null, refNumber: p.refNumber ?? null, note: p.note ?? null, createdBy: p.createdBy ?? null }).returning();
+  await bump(tx, k, { soCommitted: -p.qty });
+  return mv;
+}
+
 /** Undo all movements of a reference document (restores lots and balances). */
 export async function reverseRef(tenantId: string, refType: string, refId: string, tx: Tx = db) {
   const moves = await tx.select().from(schema.stockMovements).where(and(eq(schema.stockMovements.tenantId, tenantId), eq(schema.stockMovements.refType, refType), eq(schema.stockMovements.refId, refId)));
@@ -137,6 +161,10 @@ export async function reverseRef(tenantId: string, refType: string, refId: strin
       }
       case 'memo_out': await bump(tx, k, { memoOut: -q }); break;
       case 'memo_in': await bump(tx, k, { memoOut: q, memoIn: -q }); break;
+      case 'po_commit': await bump(tx, k, { poCommitted: -q }); break;
+      case 'po_release': await bump(tx, k, { poCommitted: q }); break;
+      case 'so_commit': await bump(tx, k, { soCommitted: -q }); break;
+      case 'so_release': await bump(tx, k, { soCommitted: q }); break;
     }
     await tx.delete(schema.stockMovements).where(eq(schema.stockMovements.id, m.id));
   }

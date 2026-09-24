@@ -114,7 +114,7 @@ export const stockMovements = pgTable(
     branchId: uuid('branch_id').notNull().references(() => branches.id, { onDelete: 'cascade' }),
     productItemId: uuid('product_item_id').notNull().references(() => productItems.id, { onDelete: 'cascade' }),
     movementDate: date('movement_date').notNull(),
-    kind: text('kind').notNull(), // in | out | memo_out | memo_in | adjust_in | adjust_out | transfer_out | transfer_in
+    kind: text('kind').notNull(), // in | out | memo_out | memo_in | adjust_in | adjust_out | transfer_out | transfer_in | po_commit | po_release | so_commit | so_release
     qty: qty('qty').notNull(), // always positive; kind gives direction
     rate: money('rate').notNull().default('0'),
     value: money('value').notNull().default('0'), // qty × rate (COGS for outs)
